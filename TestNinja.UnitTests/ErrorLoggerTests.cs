@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using TestNinja.Fundamentals;
 
@@ -6,17 +7,17 @@ namespace TestNinja.UnitTests
     [TestFixture]
     public class ErrorLoggerTests
     {
-        private ErrorLogger _errorLogger;
+        private ErrorLogger _logger;
         [SetUp]
         public void SetUp()
         {
-            _errorLogger = new ErrorLogger();
+            _logger = new ErrorLogger();
         }
         [Test]
         public void Log_WhenCalled_SetTheLastErrorProperty()
         {
-            _errorLogger.Log("a");
-            Assert.That(_errorLogger.LastError, Is.EqualTo("a"));
+            _logger.Log("a");
+            Assert.That(_logger.LastError, Is.EqualTo("a"));
         }
 
         [Test]
@@ -25,7 +26,18 @@ namespace TestNinja.UnitTests
         [TestCase(" ")]
         public void Log_InvalidError_ThrowArgumentNullException(string error)
         {
-            Assert.That(() => _errorLogger.Log(error), Throws.ArgumentNullException);
+            Assert.That(() => _logger.Log(error), Throws.ArgumentNullException);
+        }
+        
+        [Test]
+        public void Log_ValidError_RaiseErrorLoggedEvent()
+        {
+            var id = Guid.Empty;
+            
+            // subscribe to the event
+            _logger.ErrorLogged += (sender, args) => { id = args; };
+            _logger.Log("a");
+            Assert.That(id, Is.Not.EqualTo(Guid.Empty));
         }
     }
 }
