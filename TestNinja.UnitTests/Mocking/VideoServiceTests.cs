@@ -18,12 +18,11 @@ namespace TestNinja.UnitTests.Mocking
 
         }
         [Test]
-        [Ignore("Moq Object errors")]
         public void ReadVideoTitle_EmptyFile_ReturnError()
         {
-            _fileReader.Setup(fr => fr.Read("video.text")).Returns("");
+            _fileReader.Setup(fr => fr.Read("video.txt")).Returns("");
             var result = _videoService.ReadVideoTitle();
-            Assert.That(result, Does.Contain(("error")).IgnoreCase);
+            Assert.That(result, Does.Contain("error").IgnoreCase);
         }
     }
 }
