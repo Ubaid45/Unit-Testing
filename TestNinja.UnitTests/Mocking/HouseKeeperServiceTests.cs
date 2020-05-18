@@ -14,7 +14,7 @@ namespace TestNinja.UnitTests.Mocking
         private Mock<IStatementGenerator> _statementGenerator;
         private Mock<IEmailSender> _emailSender;
         private Mock<IXtraMessageBox> _messageBox;
-        private DateTime _statementDate =  new DateTime(2017, 1, 1);
+        private readonly DateTime _statementDate =  new DateTime(2017, 1, 1);
         private Housekeeper _housekeeper;
 
         [SetUp]
@@ -42,6 +42,7 @@ namespace TestNinja.UnitTests.Mocking
                 _emailSender.Object,
                 _messageBox.Object);
         }
+        
         [Test]
         public void SendStatementEmails_WhenCalled_ShouldGenerateStatements()
         {
@@ -50,5 +51,21 @@ namespace TestNinja.UnitTests.Mocking
             _statementGenerator.Verify(sg => sg.SaveStatement(
                 _housekeeper.Oid, _housekeeper.FullName, _statementDate));
         }
+        
+        [Test]
+        [TestCase("")]
+        [TestCase("  ")]
+        [TestCase(null)]
+        public void SendStatementEmails_HousekeepersEmailIsNotSpecified_ShouldNotGenerateStatement(string input)
+        {
+            _housekeeper.Email = input;
+            
+            _service.SendStatementEmails(_statementDate);
+            
+            _statementGenerator.Verify(sg => sg.SaveStatement(
+                _housekeeper.Oid, _housekeeper.FullName, _statementDate),
+                Times.Never);
+        }
+        
     }
 }
